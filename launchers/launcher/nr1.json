@@ -1,0 +1,7 @@
+{
+  "schemaType": "LAUNCHER",
+  "id": "nr1-mobile-lite-launcher",
+  "displayName": "Mobile Lite",
+  "description": "Mini version of several curated mobile UIs",
+  "rootNerdletId": "nr1-mobile-lite-nerdlet"
+}

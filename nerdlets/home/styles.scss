@@ -1,0 +1,73 @@
+.my-nerdlet {
+  outline: 1px solid black;
+}
+
+.inline-card {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.summary {
+  display: inline-block;
+  width: 50%;
+}
+
+.crashCard {
+  background-color: #cdcbcb;
+  margin-top: 20px;
+  width: 50%;
+  display: inline-block;
+}
+
+.crashItems {
+  border: 2px solid black;
+  display: inline-flex;
+  font-size: 20px;
+}
+
+.crashCycleDiv {
+  margin: auto;
+  width: 50%;
+  text-align: center;
+}
+
+.interactionList {
+  list-style-type: none;
+  display: inline-flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  width: 100%;
+  margin-bottom: 5px;
+  margin-top: 10px;
+}
+
+.stackTable {
+  display: inline-block;
+  width: 60%;
+  margin-right: 60px;
+}
+
+.errorTable {
+  display: inline-block;
+  width: 95%;
+  margin-right: 600px;
+}
+
+.attributes {
+  display: inline-block;
+  width: 35%;
+}
+
+.exceptionAttributes {
+  display: inline-block;
+  width: 40%;
+}
+
+.attributeValues:nth-child(odd) {
+  background: #FFF;
+}
+
+.attributeValues:nth-child(even) {
+  background: #CCC;
+}

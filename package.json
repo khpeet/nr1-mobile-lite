@@ -1,0 +1,24 @@
+{
+    "private": true,
+    "name": "nr1-mobile-lite",
+    "version": "0.1.0",
+    "scripts": {
+        "start": "nr1 nerdpack:serve",
+        "test": "exit 0"
+    },
+    "nr1": {
+        "uuid": "c94d9f2b-d28d-4e9d-bb17-3464323f92d8"
+    },
+    "dependencies": {
+        "prop-types": "15.7.2",
+        "react": "17.0.2",
+        "react-dom": "17.0.2",
+        "react-event-timeline": "^1.6.3",
+        "react-select": "^5.6.1"
+    },
+    "browserslist": [
+        "last 2 versions",
+        "not ie < 11",
+        "not dead"
+    ]
+}
