@@ -42,6 +42,7 @@ export default class Exceptions extends React.Component {
     let { entity, time } = this.props;
     let filterString = '';
     let versionString = '';
+    let exceptionSummary = [];
 
     if (filtersSelected.length > 0) {
       filtersSelected.map(f => {
@@ -59,9 +60,22 @@ export default class Exceptions extends React.Component {
     if (res.error) {
       console.debug(`Failed to retrieve exception summary for entity: ${entity.name}`);
     } else {
-      let exceptionSummary = res.data.actor.account.exceptionTypes.results;
+      exceptionSummary = res.data.actor.account.exceptionTypes.results;
 
-      this.setState({exceptionSummary: exceptionSummary});
+      let formattedExceptions = await this.formatTable(exceptionSummary);
+
+      this.setState({exceptionSummary: formattedExceptions});
+    }
+  }
+
+  formatTable(e) {
+    if (e.length > 0) {
+      for (var k=0; k < e.length; k++) {
+        if (e[k].message == null) {
+          e[k].message = '';
+        }
+      }
+      return e;
     }
   }
 
@@ -220,7 +234,7 @@ export default class Exceptions extends React.Component {
               {headers.map((h, i) => (
                 <TableHeaderCell
                 {...h}
-                width="fit-content"
+                width={h.key == 'Location' ? '50%' : '1fr'}
                 sortable
                 sortingType={this.state[`column_${i}`]}
                 onClick={this._onClickTableHeaderCell.bind(this, `column_${i}`)}
@@ -234,7 +248,7 @@ export default class Exceptions extends React.Component {
               return (
                 <TableRow>
                   <TableRowCell value={item} onClick={() => this.openExceptionDrilldown(item)}><a>{item.exceptionLocation}</a></TableRowCell>
-                  <TableRowCell>{item.message}</TableRowCell>
+                  <TableRowCell>{item.message == null ? '' : item.message}</TableRowCell>
                   <TableRowCell>{item['Versions Affected']}</TableRowCell>
                   <TableRowCell>{item.count}</TableRowCell>
                   <TableRowCell>{item['Users Affected']}</TableRowCell>
