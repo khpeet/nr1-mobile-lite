@@ -1,6 +1,7 @@
 import React from 'react';
-import { AreaChart, BarChart, LineChart, NerdGraphQuery, PlatformStateContext, PieChart, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell } from 'nr1';
+import { AreaChart, BarChart, Button, LineChart, NerdGraphQuery, PlatformStateContext, PieChart, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell } from 'nr1';
 import Select, { components } from 'react-select';
+import csvDownload from 'json-to-csv-export';
 import ExceptionDrilldown from './exception-drilldown';
 
 const query = require('./utils');
@@ -16,6 +17,7 @@ export default class Exceptions extends React.Component {
       filters: [],
       groupSelected: {'value': 'exceptionLocation', 'label': 'Exception Location'},
       exceptionSummary: [],
+      exportable: [],
       column_4: TableHeaderCell.SORTING_TYPE.DESCENDING,
       showExceptionDrilldown: false,
       selectedException: null
@@ -61,10 +63,15 @@ export default class Exceptions extends React.Component {
       console.debug(`Failed to retrieve exception summary for entity: ${entity.name}`);
     } else {
       exceptionSummary = res.data.actor.account.exceptionTypes.results;
+      let exportableData = [];
 
       let formattedExceptions = await this.formatTable(exceptionSummary);
 
-      this.setState({exceptionSummary: formattedExceptions});
+      if (formattedExceptions && formattedExceptions.length > 0) {
+        exportableData = await this.getExportableData(formattedExceptions);
+      }
+
+      this.setState({exceptionSummary: formattedExceptions, exportable: exportableData});
     }
   }
 
@@ -77,6 +84,23 @@ export default class Exceptions extends React.Component {
       }
       return e;
     }
+  }
+
+  getExportableData(summary) {
+    let formatted = [];
+
+    for (var i=0; i<summary.length; i++) {
+      let oneResult = {
+        Location: summary[i].exceptionLocation,
+        Exception: summary[i].message,
+        VersionsAffected: summary[i]['Versions Affected'],
+        Occurrences: summary[i].count,
+        UsersAffected: summary[i]['Users Affected']
+      }
+      formatted.push(oneResult);
+    }
+
+    return formatted;
   }
 
   renderDropdowns() {
@@ -112,10 +136,14 @@ export default class Exceptions extends React.Component {
         isSearchable
         options={versions}
         onChange={(e) => this.setState({ versionSelected: e })}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Versions</h5>
       </div>
-      <div style={{display: 'inline-block', marginRight: '8px'}}>
+      <div style={{display: 'inline-block', marginRight: '8px', width: '300px'}}>
       <Select
         aria-label="Filters"
         components={{ MultiValueLabel }}
@@ -125,6 +153,10 @@ export default class Exceptions extends React.Component {
         isMulti
         options={filters}
         onChange={(e) => this.setState({ filtersSelected: e })}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Filters</h5>
       </div>
@@ -137,6 +169,10 @@ export default class Exceptions extends React.Component {
         isSearchable
         options={groups}
         onChange={(e) => this.setState({ groupSelected: e })}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Group by</h5>
       </div>
@@ -153,7 +189,7 @@ export default class Exceptions extends React.Component {
   }
 
   renderData() {
-    let { exceptionSummary, filters, filtersSelected, groupSelected, versions, versionSelected } = this.state;
+    let { exceptionSummary, exportable, filters, filtersSelected, groupSelected, versions, versionSelected } = this.state;
     let { entity, time } = this.props;
     let filterString = '';
     let versionString = '';
@@ -229,6 +265,14 @@ export default class Exceptions extends React.Component {
           ?
           <>
           <h4>{`Exception Types (${exceptionSummary.length})`}</h4>
+          <Button
+            className="export"
+            onClick={() => csvDownload({data: exportable, filename: 'exceptions.csv'})}
+            type={Button.TYPE.PRIMARY}
+            iconType={Button.ICON_TYPE.INTERFACE__OPERATIONS__EXPORT}
+          >
+            Export
+          </Button>
           <Table items={exceptionSummary}>
             <TableHeader>
               {headers.map((h, i) => (

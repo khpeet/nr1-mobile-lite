@@ -61,7 +61,8 @@ export default class ExceptionDrilldown extends React.Component {
     let fpResponse = await NerdGraphQuery.query({query: query.exceptionFingerprint(entity.account.id, time, entity.guid, filterString, selected.exceptionLocation)});
 
     if (fpResponse.error) {
-      console.debug(`Failed to retrieve exception fingerPrint for exceptionLocation: ${selected.facet[0]} within entity: ${entity.name}`);
+      console.debug(`Failed to retrieve exception fingerPrint for exceptionLocation: ${selected.facet} within entity: ${entity.name}`);
+      console.debug(fpResponse.error);
     } else {
       let fingerprint = fpResponse.data.actor.account.fingerPrint.results;
 
@@ -69,7 +70,8 @@ export default class ExceptionDrilldown extends React.Component {
         let occurrencesResp = await NerdGraphQuery.query({query: query.exceptionOccurrences(entity.account.id, time, filterString, fingerprint[0].fp)});
 
         if (occurrencesResp.error) {
-          console.debug(`Failed to retrieve exception occurrences for exceptionLocation: ${selected.facet[0]} within entity: ${entity.name}`);
+          console.debug(`Failed to retrieve exception occurrences for exceptionLocation: ${selected.facet} within entity: ${entity.name}`);
+          console.debug(occurrencesResp.error);
         } else {
           let occurrences = occurrencesResp.data.actor.account.occurrences.results;
 

@@ -118,10 +118,14 @@ export default class HttpErrors extends React.Component {
         isSearchable
         options={versions}
         onChange={(e) => this.setState({ versionSelected: e })}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Versions</h5>
       </div>
-      <div style={{display: 'inline-block', marginRight: '8px'}}>
+      <div style={{display: 'inline-block', marginRight: '8px', width: '300px'}}>
       <Select
         aria-label="Filters"
         components={{ MultiValueLabel }}
@@ -131,6 +135,10 @@ export default class HttpErrors extends React.Component {
         isMulti
         options={filters}
         onChange={(e) => this.setState({ filtersSelected: e })}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Filters</h5>
       </div>
@@ -143,6 +151,10 @@ export default class HttpErrors extends React.Component {
         isSearchable
         options={groups}
         onChange={(e) => this.setState({ groupSelected: e })}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Group by</h5>
       </div>

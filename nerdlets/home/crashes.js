@@ -1,6 +1,7 @@
 import React from 'react';
-import { AreaChart, BarChart, LineChart, NerdGraphQuery, PlatformStateContext, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell } from 'nr1';
+import { AreaChart, BarChart, Button, LineChart, NerdGraphQuery, PlatformStateContext, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell } from 'nr1';
 import Select, { components } from 'react-select';
+import csvDownload from 'json-to-csv-export';
 import CrashDrilldown from './crash-drilldown';
 
 const query = require('./utils');
@@ -16,6 +17,7 @@ export default class Crashes extends React.Component {
       filters: [],
       groupSelected: {'value': 'crashLocation', 'label': 'Crash Location'},
       crashSummary: [],
+      exportable: [],
       column_5: TableHeaderCell.SORTING_TYPE.DESCENDING,
       showCrashDrilldown: false,
       selectedCrash: null
@@ -60,9 +62,33 @@ export default class Crashes extends React.Component {
       console.debug(`Failed to retrieve crash summary for entity: ${entity.name}`);
     } else {
       let crashSummary = res.data.actor.account.crashTypes.results;
+      let exportableData = [];
 
-      this.setState({crashSummary: crashSummary});
+      if (crashSummary && crashSummary.length > 0) {
+        exportableData = await this.getExportableData(crashSummary);
+      }
+
+      this.setState({crashSummary: crashSummary, exportable: exportableData});
     }
+  }
+
+  getExportableData(summary) {
+    let formatted = [];
+
+    for (var i=0; i<summary.length; i++) {
+      let oneResult = {
+        Location: summary[i].facet[0],
+        Exception: summary[i].Exception,
+        FirstSeen: new Date(summary[i].First).toLocaleString(),
+        LastSeen: new Date(summary[i].Last).toLocaleString(),
+        AppVersion: summary[i].facet[1],
+        Count: summary[i].count,
+        UsersAffected: summary[i]['Users Affected']
+      }
+      formatted.push(oneResult);
+    }
+
+    return formatted;
   }
 
   renderDropdowns() {
@@ -98,10 +124,14 @@ export default class Crashes extends React.Component {
         isSearchable
         options={versions}
         onChange={(e) => this.setState({ versionSelected: e })}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Versions</h5>
       </div>
-      <div style={{display: 'inline-block', marginRight: '8px'}}>
+      <div style={{display: 'inline-block', marginRight: '8px', width: '300px'}}>
       <Select
         aria-label="Filters"
         components={{ MultiValueLabel }}
@@ -111,6 +141,10 @@ export default class Crashes extends React.Component {
         isMulti
         options={filters}
         onChange={(e) => this.setState({ filtersSelected: e })}
+        menuPortalTarget={document.body}
+        menuPlacement="auto"
+        menuPosition="fixed"
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Filters</h5>
       </div>
@@ -123,6 +157,8 @@ export default class Crashes extends React.Component {
         isSearchable
         options={groups}
         onChange={(e) => this.setState({ groupSelected: e })}
+        menuPortalTarget={document.body}
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
       />
       <h5 style={{textAlign: 'center'}}>Group by</h5>
       </div>
@@ -140,7 +176,7 @@ export default class Crashes extends React.Component {
 
 
   renderData() {
-    let { crashSummary, filters, filtersSelected, groupSelected, versions, versionSelected } = this.state;
+    let { crashSummary, exportable, filters, filtersSelected, groupSelected, versions, versionSelected } = this.state;
     let { entity, time } = this.props;
     let filterString = '';
     let versionString = '';
@@ -218,6 +254,14 @@ export default class Crashes extends React.Component {
           ?
           <>
           <h4>{`Crash Types (${crashSummary.length})`}</h4>
+          <Button
+            className="export"
+            onClick={() => csvDownload({data: exportable, filename: 'crashes.csv'})}
+            type={Button.TYPE.PRIMARY}
+            iconType={Button.ICON_TYPE.INTERFACE__OPERATIONS__EXPORT}
+          >
+            Export
+          </Button>
           <Table items={crashSummary}>
             <TableHeader>
               {headers.map((h, i) => (
