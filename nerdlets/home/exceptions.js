@@ -61,6 +61,7 @@ export default class Exceptions extends React.Component {
 
     if (res.error) {
       console.debug(`Failed to retrieve exception summary for entity: ${entity.name}`);
+      console.debug(res.error);
     } else {
       exceptionSummary = res.data.actor.account.exceptionTypes.results;
       let exportableData = [];

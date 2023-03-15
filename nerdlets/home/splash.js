@@ -29,6 +29,7 @@ export default class Splash extends React.Component {
 
     if (result.error) {
       console.debug(`Failed to fetch mobile entities`);
+      console.debug(result.error);
     } else {
       let mobileApps = result.data.actor.entitySearch.results.entities;
       this.setState({ apps: mobileApps });

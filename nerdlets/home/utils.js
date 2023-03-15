@@ -41,16 +41,16 @@ return `
 {
   actor {
     account(id: ${account}) {
-      mobileVersions: nrql(query: "FROM MobileRequest SELECT count(*) facet appVersion, appVersionId where entityGuid = '${guid}' ${time} LIMIT 15", timeout: 90) {
+      mobileVersions: nrql(query: "FROM MobileRequest SELECT count(*) facet appVersion, appVersionId where entityGuid = '${guid}' since 1 day ago LIMIT 15", timeout: 120) {
         results
       }
-      mobileFilters: nrql(query: "FROM Mobile SELECT uniques(crashLocation), uniques(crashMessage), uniques(crashException), uniques(countryCode), uniques(device), uniques(osVersion), uniques(sessionId), uniques(deviceUuid) where entityGuid = '${guid}' ${time} LIMIT 500", timeout: 90) {
+      mobileFilters: nrql(query: "FROM Mobile SELECT uniques(crashLocation), uniques(crashMessage), uniques(crashException), uniques(countryCode), uniques(device), uniques(osVersion), uniques(sessionId), uniques(deviceUuid) where entityGuid = '${guid}' ${time} LIMIT 500", timeout: 120) {
         results
       }
-      mobileExceptionFilters: nrql(query: "FROM MobileHandledException SELECT uniques(exceptionLocation), uniques(exceptionMessage), uniques(exceptionName), uniques(countryCode), uniques(device), uniques(osVersion), uniques(sessionId), uniques(deviceUuid) where entityGuid = '${guid}' ${time} LIMIT 500", timeout: 90) {
+      mobileExceptionFilters: nrql(query: "FROM MobileHandledException SELECT uniques(exceptionLocation), uniques(exceptionMessage), uniques(exceptionName), uniques(countryCode), uniques(device), uniques(osVersion), uniques(sessionId), uniques(deviceUuid) where entityGuid = '${guid}' ${time} LIMIT 500", timeout: 120) {
         results
       }
-      mobileHttpFilters: nrql(query: "FROM MobileRequestError SELECT uniques(requestDomain), uniques(requestUrl), uniques(requestPath), uniques(countryCode), uniques(device), uniques(osVersion), uniques(sessionId), uniques(deviceUuid) where entityGuid = '${guid}' ${time} LIMIT 500", timeout: 90) {
+      mobileHttpFilters: nrql(query: "FROM MobileRequestError SELECT uniques(requestDomain), uniques(requestUrl), uniques(requestPath), uniques(countryCode), uniques(device), uniques(osVersion), uniques(sessionId), uniques(deviceUuid) where entityGuid = '${guid}' ${time} LIMIT 500", timeout: 120) {
         results
       }
     }

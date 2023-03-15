@@ -60,6 +60,7 @@ export default class Crashes extends React.Component {
 
     if (res.error) {
       console.debug(`Failed to retrieve crash summary for entity: ${entity.name}`);
+      console.debug(res.error)
     } else {
       let crashSummary = res.data.actor.account.crashTypes.results;
       let exportableData = [];

@@ -64,6 +64,7 @@ export default class HttpErrorDrilldown extends React.Component {
 
     if (errorResp.error) {
       console.debug(`Failed to retrieve error occurrences for requestUrl: ${selected.facet[0]}`);
+      console.debug(errorResp.error);
     } else {
       let occurrences = errorResp.data.actor.account.occurrences.results;
       let summary = errorResp.data.actor.account.summary.results;
