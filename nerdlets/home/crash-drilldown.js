@@ -66,6 +66,7 @@ export default class CrashDrilldown extends React.Component {
 
     if (fpResponse.error) {
       console.debug(`Failed to retrieve crash fingerPrint for crashLocation: ${selected.facet[0]} within entity: ${entity.name}`);
+      console.debug(fpResponse);
     } else {
       let fingerprint = fpResponse.data.actor.account.fingerPrint.results;
 
@@ -74,6 +75,7 @@ export default class CrashDrilldown extends React.Component {
 
         if (occurrencesResp.error) {
           console.debug(`Failed to retrieve crash occurrences for crashLocation: ${selected.facet[0]} within entity: ${entity.name}`);
+          console.debug(occurrencesResp);
         } else {
           let occurrences = occurrencesResp.data.actor.account.occurrences.results;
 
@@ -139,6 +141,7 @@ export default class CrashDrilldown extends React.Component {
 
     if (res.error && res !== undefined) {
       console.debug(`Failed to retrieve interaction trail for occurrence: ${co}`);
+      console.debug(res);
     } else {
       interactionHistory = JSON.parse(res.data.actor.account.interactionTrail.results[0]['latest.interactionHistory']);
       if (interactionHistory !== null) {
@@ -167,7 +170,7 @@ export default class CrashDrilldown extends React.Component {
 
     if (res.error) {
       console.debug(`Failed to retrieve stack trace for occurrence: ${co}`);
-      console.debug(res.error)
+      console.debug(res);
     } else {
       stackTrace = res.data.actor.entity.crash.stackTrace.frames;
     }
@@ -181,7 +184,8 @@ export default class CrashDrilldown extends React.Component {
     let res = await NerdGraphQuery.query({ query: query.eventTrail(e.account.id, e.guid, t, cf, co.sessionId)});
 
     if (res.error) {
-      console.debug(`Failed to retrieve event trail for occurrence: ${co}`);
+      console.debug(`Failed to retrieve event trail for occurrence: ${co.sessionId}`);
+      console.debug(res);
     } else {
       eventTrail = res.data.actor.account;
       delete eventTrail.id;

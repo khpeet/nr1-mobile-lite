@@ -268,7 +268,7 @@ export default class Crashes extends React.Component {
               {headers.map((h, i) => (
                 <TableHeaderCell
                 {...h}
-                width="fit-content"
+                width={h.key == 'Location' ? '50%' : '1fr'}
                 sortable
                 sortingType={this.state[`column_${i}`]}
                 onClick={this._onClickTableHeaderCell.bind(this, `column_${i}`)}
@@ -281,7 +281,7 @@ export default class Crashes extends React.Component {
             {({ item }) => {
               return (
                 <TableRow>
-                  <TableRowCell value={item} onClick={() => this.openCrashDrilldown(item)}><a>{item.facet[0]}</a></TableRowCell>
+                  <TableRowCell style={{whiteSpace: 'unset'}} value={item} onClick={() => this.openCrashDrilldown(item)}><a>{item.facet[0]}</a></TableRowCell>
                   <TableRowCell>{item.Exception}</TableRowCell>
                   <TableRowCell>{new Date(item.First).toLocaleString()}</TableRowCell>
                   <TableRowCell>{new Date(item.Last).toLocaleString()}</TableRowCell>

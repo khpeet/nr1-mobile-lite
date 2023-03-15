@@ -32,7 +32,6 @@ export default class Overview extends React.Component {
     let exceptionGroups = [];
     let httpGroups = [];
 
-    console.log(query.mobileData(entity.account.id, time, entity.guid));
     const res = await NerdGraphQuery.query({ query: query.mobileData(entity.account.id, time, entity.guid)});
 
     if (res.error) {
