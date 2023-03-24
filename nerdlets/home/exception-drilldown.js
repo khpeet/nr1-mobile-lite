@@ -1,6 +1,7 @@
 import React from 'react';
-import { BlockText, Card, CardHeader, CardBody, HeadingText, Icon, LineChart, NerdGraphQuery, SectionMessage, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell, Tabs, TabsItem, TileGroup, Tile } from 'nr1';
+import { BlockText, Button, Card, CardHeader, CardBody, HeadingText, Icon, LineChart, NerdGraphQuery, SectionMessage, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell, Tabs, TabsItem, TileGroup, Tile } from 'nr1';
 import Select, { components } from 'react-select';
+import csvDownload from 'json-to-csv-export';
 
 const query = require('./utils');
 
@@ -16,7 +17,8 @@ export default class ExceptionDrilldown extends React.Component {
       currentOccurrence: null,
       currentIndex: 0,
       stackTrace: null,
-      noResults: false
+      noResults: false,
+      exportable: []
     };
   }
 
@@ -89,6 +91,7 @@ export default class ExceptionDrilldown extends React.Component {
     let { entity, time } = this.props;
     let { currentOccurrence } = this.state;
     let stackTrace = null;
+    let exportable = [];
 
     let res = await NerdGraphQuery.query({ query: query.exceptionStackTrace(entity.guid, currentOccurrence.facet[0])});
 
@@ -97,10 +100,26 @@ export default class ExceptionDrilldown extends React.Component {
       console.debug(res.error)
     } else {
       stackTrace = res.data.actor.entity.exception.stackTrace.frames;
+      exportable = await this.getExportableData(stackTrace);
     }
 
-    this.setState({stackTrace: stackTrace});
+    this.setState({stackTrace: stackTrace, exportable: exportable});
   }
+
+  getExportableData(trace) {
+    let formatted = [];
+
+    for (var i=0; i<trace.length; i++) {
+      let oneResult = {
+        Name: trace[i].name,
+        Location: trace[i].formatted,
+      }
+      formatted.push(oneResult);
+    }
+
+    return formatted;
+  }
+
 
   renderSummaryCard() {
     let { selected } = this.props;
@@ -248,7 +267,7 @@ export default class ExceptionDrilldown extends React.Component {
   }
 
   renderStackTrace() {
-    let { stackTrace } = this.state;
+    let { exportable, stackTrace } = this.state;
 
     const headers = [
       {key: 'Name', value: ({ item }) => item.name},
@@ -260,6 +279,14 @@ export default class ExceptionDrilldown extends React.Component {
         return (
           <div className="stackTable">
           <HeadingText type={HeadingText.TYPE.HEADING_3}>Stack Trace</HeadingText>
+          <Button
+            className="export"
+            onClick={() => csvDownload({data: exportable, filename: 'handled_exception_trace.csv'})}
+            type={Button.TYPE.PRIMARY}
+            iconType={Button.ICON_TYPE.INTERFACE__OPERATIONS__EXPORT}
+          >
+            Export
+          </Button>
           <Table className="stackRow" fullWidth items={stackTrace}>
           <TableHeader>
             {headers.map((h, i) => (

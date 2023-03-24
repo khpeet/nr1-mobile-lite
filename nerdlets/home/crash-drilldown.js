@@ -1,7 +1,8 @@
 import React from 'react';
-import { BlockText, Card, CardHeader, CardBody, HeadingText, Icon, LineChart, NerdGraphQuery, SectionMessage, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell, Tabs, TabsItem, TileGroup, Tile } from 'nr1';
+import { BlockText, Button, Card, CardHeader, CardBody, HeadingText, Icon, LineChart, NerdGraphQuery, SectionMessage, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell, Tabs, TabsItem, TileGroup, Tile } from 'nr1';
 import Select, { components } from 'react-select';
 import { Timeline, TimelineEvent } from 'react-event-timeline';
+import csvDownload from 'json-to-csv-export';
 
 const query = require('./utils');
 
@@ -19,7 +20,8 @@ export default class CrashDrilldown extends React.Component {
       occurrenceDetail: null,
       showAllInteractions: false,
       eventContentCollapsed: true,
-      noResults: false
+      noResults: false,
+      exportable: []
     };
   }
 
@@ -96,6 +98,7 @@ export default class CrashDrilldown extends React.Component {
     let counts = [];
     let aSingleCount = null;
     let formattedTrail = [];
+    let exportableCrash = [];
 
     if (filtersSelected.length > 0) {
       filtersSelected.map(f => {
@@ -124,12 +127,17 @@ export default class CrashDrilldown extends React.Component {
     }
 
 
+    if (results[1].length > 0) {
+      exportableCrash = await this.getExportableData(results[1]);
+    }
+
+
     await formattedTrail.sort((a, b) => {
       return Number(b.timestamp) - Number(a.timestamp);
     });
 
 
-    await this.setState({ occurrenceDetail: results, eventTrailCounts: counts, eventTrail: formattedTrail });
+    await this.setState({ occurrenceDetail: results, eventTrailCounts: counts, eventTrail: formattedTrail, exportable: exportableCrash });
   }
 
   async getInterationTrail(co, cf, e, t) {
@@ -160,6 +168,20 @@ export default class CrashDrilldown extends React.Component {
 
 
     return formattedHistory;
+  }
+
+  getExportableData(trace) {
+    let formatted = [];
+
+    for (var i=0; i<trace.length; i++) {
+      let oneResult = {
+        Name: trace[i].name,
+        Location: trace[i].formatted,
+      }
+      formatted.push(oneResult);
+    }
+
+    return formatted;
   }
 
   async getStackTrace(co, e) { //LIMIT: can only fetch traces in past 60 minutes
@@ -445,7 +467,7 @@ export default class CrashDrilldown extends React.Component {
   }
 
   renderStackTrace() {
-    let { occurrenceDetail } = this.state;
+    let { exportable, occurrenceDetail } = this.state;
 
     const headers = [
       {key: 'Name', value: ({ item }) => item.name},
@@ -457,6 +479,14 @@ export default class CrashDrilldown extends React.Component {
         return (
           <div className="stackTable">
           <HeadingText type={HeadingText.TYPE.HEADING_3}>Stack Trace</HeadingText>
+          <Button
+            className="export"
+            onClick={() => csvDownload({data: exportable, filename: 'stack_trace.csv'})}
+            type={Button.TYPE.PRIMARY}
+            iconType={Button.ICON_TYPE.INTERFACE__OPERATIONS__EXPORT}
+          >
+            Export
+          </Button>
           <Table className="stackRow" fullWidth items={occurrenceDetail[1]}>
           <TableHeader>
             {headers.map((h, i) => (
