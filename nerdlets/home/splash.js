@@ -1,5 +1,5 @@
 import React from 'react';
-import { NerdGraphQuery, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell, EntityTitleTableRowCell } from 'nr1';
+import { NerdGraphQuery, Spinner, Table, TableHeader, TableHeaderCell, TableRow, TableRowCell, TextField, EntityTitleTableRowCell } from 'nr1';
 import Overview from './overview';
 
 const query = require('./utils');
@@ -14,8 +14,6 @@ export default class Splash extends React.Component {
       selected: null
     };
   }
-
-  //TODO: time picker should update this page
 
   async componentDidMount() {
     await this.getMobileApps();
@@ -32,6 +30,7 @@ export default class Splash extends React.Component {
       console.debug(result.error);
     } else {
       let mobileApps = result.data.actor.entitySearch.results.entities;
+      console.log(mobileApps);
       this.setState({ apps: mobileApps });
     }
   }
@@ -45,6 +44,7 @@ export default class Splash extends React.Component {
 
     const headers = [
       {key: 'Name', value: ({ item }) => item.name},
+      {key: 'Account', value: ({ item }) => item.account.name},
       {key: 'appLaunchCount', value: ({ item }) => item.mobileSummary.appLaunchCount},
       {key: 'crashCount', value: ({ item }) => item.mobileSummary.crashCount},
       {key: 'httpErrorRate', value: ({ item }) => item.mobileSummary.httpErrorRate},
@@ -71,6 +71,7 @@ export default class Splash extends React.Component {
               value={item}
               onClick={() => this.openDrilldown(item)}
               />
+              <TableRowCell>{item.account.name == null ? '-' : item.account.name}</TableRowCell>
               <TableRowCell>{item.mobileSummary.appLaunchCount == null ? '-' : item.mobileSummary.appLaunchCount}</TableRowCell>
               <TableRowCell>{item.mobileSummary.crashCount == null ? '-' : item.mobileSummary.crashCount}</TableRowCell>
               <TableRowCell>{item.mobileSummary.httpErrorRate == null ? '-' : item.mobileSummary.httpErrorRate}</TableRowCell>

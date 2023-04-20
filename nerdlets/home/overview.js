@@ -124,7 +124,7 @@ export default class Overview extends React.Component {
     let frequentInteractionsNrql = null
 
     if (versionSelected.value == 'all') {
-      crashesNrql = `SELECT percentage(uniqueCount(uuid), WHERE category = 'Crash') AS 'Crash Rate' FROM Mobile WHERE entityGuid = '${entity.guid}' ${time}`;
+      crashesNrql = `SELECT percentage(uniqueCount(sessionId), where category = 'Crash') as 'Crash rate' FROM MobileSession, MobileCrash WHERE (entityGuid = '${entity.guid}') LIMIT 5 ${time}`;
       crashesTimeseriesNrql = `SELECT count(*) FROM MobileCrash WHERE (entityGuid = '${entity.guid}') FACET appVersion LIMIT 5 ${time} TIMESERIES`;
       httpErrorsNrql = `SELECT filter(average(newrelic.timeslice.value), WHERE (metricTimesliceName = 'Mobile/FailedCallRate')) AS 'Network failures', filter(average(newrelic.timeslice.value), WHERE (metricTimesliceName = 'Mobile/StatusErrorRate')) AS 'HTTP errors' FROM Metric WHERE (entityGuid = '${entity.guid}') LIMIT 1000 ${time} TIMESERIES`;
       httpResponseTimeNrql = `SELECT average(newrelic.timeslice.value) * 1000 FROM Metric WHERE (entityGuid = '${entity.guid}') FACET requestDomain LIMIT 5 ${time} WITH METRIC_FORMAT 'External/{requestDomain}/all' TIMESERIES`;
@@ -132,7 +132,7 @@ export default class Overview extends React.Component {
       frequentInteractionsNrql = `FROM Mobile SELECT count(*) as 'Count', average(interactionDuration) as 'Avg Duration (ms)' where entityGuid = '${entity.guid}' facet name ${time} LIMIT 5`
     } else {
       let numericId = Number(versionSelected.value);
-      crashesNrql = `SELECT percentage(uniqueCount(uuid), WHERE category = 'Crash') AS 'Crash Rate' FROM Mobile WHERE entityGuid = '${entity.guid}' and appVersion = '${versionSelected.label}' ${time}`
+      crashesNrql = `SELECT percentage(uniqueCount(sessionId), where category = 'Crash') as 'Crash rate' FROM MobileSession, MobileCrash WHERE (entityGuid = '${entity.guid}') and (appVersion = '${versionSelected.label}') LIMIT 5 ${time}`
       crashesTimeseriesNrql = `SELECT count(*) FROM MobileCrash WHERE (entityGuid = '${entity.guid}') and (appVersion = '${versionSelected.label}') FACET appVersion LIMIT 5 ${time} TIMESERIES`;
       httpErrorsNrql = `SELECT filter(average(newrelic.timeslice.value), WHERE (metricTimesliceName = 'Mobile/FailedCallRate')) AS 'Network failures', filter(average(newrelic.timeslice.value), WHERE (metricTimesliceName = 'Mobile/StatusErrorRate')) AS 'HTTP errors' FROM Metric WHERE (entityGuid = '${entity.guid}') and (realAgentId = ${numericId}) LIMIT 1000 ${time} TIMESERIES`;
       httpResponseTimeNrql = `SELECT average(newrelic.timeslice.value) * 1000 FROM Metric WHERE (entityGuid = '${entity.guid}') and (realAgentId = ${numericId}) FACET requestDomain LIMIT 5 ${time} WITH METRIC_FORMAT 'External/{requestDomain}/all' TIMESERIES`;
